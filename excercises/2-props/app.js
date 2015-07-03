@@ -11,7 +11,7 @@
 //   the prop to be "userEmail" or "loginId"? Switch the Gravatar
 //   prop name from "email" to "loginId", send a bad value, and then
 //   fix the code to make the warning make sense.
-// - how many times does `getDefaultProps` get called?
+// - how many times does `getDefaultProps` get called? 1
 // - experiment with some of the other propTypes, send improper values
 //   and look at the messages you get
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,31 +24,47 @@ var warning = require('react/lib/warning');
 var GRAVATAR_URL = "http://gravatar.com/avatar";
 
 var USERS = [
-  { id: 1, name: 'Ryan Florence', email: 'rpflorencegmail.com' },
-  { id: 2, name: 'Michael Jackson', email: 'mjijackson@gmail.com' }
+  { id: 1, name: 'Ryan Florence', loginId: 'rpflorencegmail.com' },
+  { id: 2, name: 'Michael Jackson', loginId: 'mjijackson@gmail.com' }
 ];
 
 var emailType = (props, propName, componentName) => {
   warning(
-    validateEmail(props.email),
-    `Invalid email '${props.email}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+    validateEmail(props[propName]),
+    `Invalid ${propName} '${props[propName]}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
   );
 };
 
+var validateSize = (input) => {
+  return !isNaN(parseInt(input));
+}
+
+var sizeType = (props, propName, componentName) => {
+  warning(
+    validateSize(props[propName]),
+    `Invalid ${propName} '${props[propName]}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+  );
+};
+
+var counter = 0;
+
 var Gravatar = React.createClass({
   propTypes: {
-    email: emailType
+    loginId: emailType,
+    size: sizeType
   },
 
   getDefaultProps () {
+    counter++;
+    console.log(`getDefaultProps was run ${counter} times`);
     return {
       size: 16
     };
   },
 
   render () {
-    var { email, size } = this.props;
-    var hash = md5(email);
+    var { loginId, size } = this.props;
+    var hash = md5(loginId);
     var url = `${GRAVATAR_URL}/${hash}?s=${size*2}`;
     return <img src={url} width={size} />;
   }
@@ -56,10 +72,10 @@ var Gravatar = React.createClass({
 
 var App = React.createClass({
   render () {
-    var users = USERS.map((user) => {
+    var users = this.props.users.map((user) => {
       return (
         <li key={user.id}>
-          <Gravatar email={user.email} size={36} /> {user.name}
+          <Gravatar loginId={user.loginId} size={36} /> {user.name}
         </li>
       );
     });
@@ -72,7 +88,6 @@ var App = React.createClass({
   }
 });
 
-React.render(<App />, document.body);
-
-//require('./tests').run(Gravatar, emailType);
-
+React.render(<App users={USERS}/>, document.body, () => {
+  require('./tests').run(Gravatar, emailType);
+});
