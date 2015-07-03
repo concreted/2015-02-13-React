@@ -32,6 +32,7 @@ var Menu = React.createClass({
 
     return (
       <div>
+        <h1>{DATA.title}</h1>
         <ul>
           {listItems}
         </ul>
