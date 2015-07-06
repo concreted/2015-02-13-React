@@ -18,7 +18,7 @@ var App = React.createClass({
     }
   },
 
-  changeTab (index) {
+  handleTabClick (index) {
     this.setState({
       activeTab: index
     });
@@ -27,7 +27,7 @@ var App = React.createClass({
   renderTabs () {
     return this.props.countries.map((country, index) => {
       return (
-        <div onClick={ this.changeTab.bind(this, index) } style={index === this.state.activeTab ? styles.activeTab : styles.tab}>
+        <div onClick={ this.handleTabClick.bind(this, index) } style={index === this.state.activeTab ? styles.activeTab : styles.tab}>
           {country.name}
         </div>
       );
